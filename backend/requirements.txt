@@ -30,5 +30,5 @@ scikit-learn
 
 beautifulsoup4
 lxml
-
+pypdf
 aiofiles
