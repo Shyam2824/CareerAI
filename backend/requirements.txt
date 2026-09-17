@@ -25,7 +25,7 @@ numpy
 pandas
 
 Pillow
-
+razorpay
 scikit-learn
 reportlab
 beautifulsoup4
