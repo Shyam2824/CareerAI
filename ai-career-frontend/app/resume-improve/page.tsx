@@ -52,7 +52,7 @@ interface Analysis {
 }
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+  process.env.NEXT_PUBLIC_API_URL || "https://careerai-5-mn6f.onrender.com";
 
 export default function ResumeImprovePage() {
   const [resumes, setResumes] = useState<Resume[]>([]);
