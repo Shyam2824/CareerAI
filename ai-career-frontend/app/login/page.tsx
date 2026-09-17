@@ -163,7 +163,7 @@ export default function LoginPage() {
           err.message === "Network Error"
         ) {
           setError(
-            "Unable to connect to CareerAI server. Please make sure the backend is running on http://127.0.0.1:8000."
+            "Unable to connect to CareerAI server. Please make sure the backend is running on https://careerai-5-mn6f.onrender.com"
           );
 
           return;
