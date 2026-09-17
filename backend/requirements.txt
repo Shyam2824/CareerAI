@@ -27,7 +27,7 @@ pandas
 Pillow
 
 scikit-learn
-
+reportlab
 beautifulsoup4
 lxml
 pypdf
