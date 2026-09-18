@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-
+from routers import admin
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -401,11 +401,10 @@ app.include_router(
 
 
 # 21.10 AI Career Report
-app.include_router(
-    career_report_router
-)
-
+app.include_router(career_report_router)
 app.include_router(mentors_router)
+app.include_router(admin.router)
+
 
 app.add_exception_handler(
     StarletteHTTPException,
