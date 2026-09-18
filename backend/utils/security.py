@@ -1,54 +1,70 @@
 import os
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict
 
+import bcrypt
+from dotenv import load_dotenv
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 
-SECRET_KEY = os.getenv(
-    "SECRET_KEY",
-    "careerai-development-secret-change-this"
-)
+load_dotenv()
+
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY is not configured.")
+
 
 ALGORITHM = os.getenv(
-    "JWT_ALGORITHM",
-    "HS256"
+    "ALGORITHM",
+    "HS256",
 )
 
 ACCESS_TOKEN_EXPIRE_MINUTES = int(
     os.getenv(
         "ACCESS_TOKEN_EXPIRE_MINUTES",
-        "60"
+        "1440",
     )
-)
-
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto"
 )
 
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    password_bytes = password.encode("utf-8")
+
+    if len(password_bytes) > 72:
+        raise ValueError(
+            "Password must be 72 bytes or fewer."
+        )
+
+    hashed = bcrypt.hashpw(
+        password_bytes,
+        bcrypt.gensalt(),
+    )
+
+    return hashed.decode("utf-8")
 
 
 def verify_password(
     plain_password: str,
-    hashed_password: str
+    hashed_password: str,
 ) -> bool:
-    return pwd_context.verify(
-        plain_password,
-        hashed_password
+
+    password_bytes = plain_password.encode("utf-8")
+
+    if len(password_bytes) > 72:
+        return False
+
+    return bcrypt.checkpw(
+        password_bytes,
+        hashed_password.encode("utf-8"),
     )
 
 
 def create_access_token(
-    data: Dict[str, Any],
-    expires_delta: timedelta | None = None
-) -> str:
-
-    to_encode = data.copy()
+    data: dict,
+    expires_delta: timedelta | None = None,
+):
+    payload = data.copy()
 
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -60,26 +76,21 @@ def create_access_token(
             )
         )
 
-    to_encode.update({
-        "exp": expire
-    })
+    payload["exp"] = expire
 
     return jwt.encode(
-        to_encode,
+        payload,
         SECRET_KEY,
-        algorithm=ALGORITHM
+        algorithm=ALGORITHM,
     )
 
 
 def decode_access_token(token: str):
     try:
-        payload = jwt.decode(
+        return jwt.decode(
             token,
             SECRET_KEY,
-            algorithms=[ALGORITHM]
+            algorithms=[ALGORITHM],
         )
-
-        return payload
-
     except JWTError:
         return None

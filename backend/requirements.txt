@@ -1,6 +1,7 @@
 fastapi
 uvicorn[standard]
 python-dotenv
+
 pydantic
 pydantic-settings
 email-validator
@@ -9,7 +10,6 @@ sqlalchemy
 psycopg2-binary
 
 python-jose[cryptography]
-passlib[bcrypt]
 bcrypt
 
 python-multipart
@@ -18,17 +18,20 @@ httpx
 requests
 
 PyPDF2
+pypdf
 python-docx
 openpyxl
 
 numpy
 pandas
-
 Pillow
-razorpay
+
 scikit-learn
+
 reportlab
+
 beautifulsoup4
 lxml
-pypdf
 aiofiles
+
+razorpay
