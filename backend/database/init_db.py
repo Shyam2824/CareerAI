@@ -1,4 +1,5 @@
 from database.database import Base, engine
+from sqlalchemy import text
 
 # Import every model so SQLAlchemy knows about all tables.
 from models.user import User

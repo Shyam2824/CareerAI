@@ -59,10 +59,10 @@ def register_user(
             detail="Email is required",
         )
 
-    if len(password) < 8:
+    if len(password.encode("utf-8")) > 72:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must contain at least 8 characters",
+            detail="Password must be 72 bytes or fewer.",
         )
 
     # -----------------------------------------------------
@@ -125,7 +125,6 @@ def register_user(
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "user": user,
     }
 
 
@@ -198,7 +197,6 @@ def login_user(
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "user": user,
     }
 
 

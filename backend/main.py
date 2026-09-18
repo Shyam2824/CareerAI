@@ -125,8 +125,6 @@ from routers.skill_gap import (
 )
 
 
-from routers.mentor import router as mentors_router
-from routers.career_chat import (router as career_path_router )
 from routers.learning_roadmap import (router as learning_roadmap_router)
 from routers.career_chat import (router as career_chat_router)
 from routers.career_score import (router as career_score_router)
@@ -180,44 +178,22 @@ def startup_event():
 # CORS
 # ============================================================
 
-FRONTEND_URL = os.getenv(
-    "FRONTEND_URL",
-    "http://localhost:3000",
-)
-
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000").strip().rstrip("/")
+FRONTEND_URLS = os.getenv("FRONTEND_URLS", "").split(",")
 ALLOWED_ORIGINS = [
-    FRONTEND_URL,
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    origin.strip().rstrip("/")
+    for origin in [FRONTEND_URL, *FRONTEND_URLS, "http://localhost:3000", "http://127.0.0.1:3000"]
+    if origin.strip()
 ]
-
-# Remove duplicate origins
-ALLOWED_ORIGINS = list(
-    dict.fromkeys(ALLOWED_ORIGINS)
-)
-
+ALLOWED_ORIGINS = list(dict.fromkeys(ALLOWED_ORIGINS))
 
 app.add_middleware(
     CORSMiddleware,
-
     allow_origins=ALLOWED_ORIGINS,
-
+    allow_origin_regex=r"https://[a-zA-Z0-9-]+\.vercel\.app",
     allow_credentials=True,
-
-    allow_methods=[
-        "GET",
-        "POST",
-        "PUT",
-        "PATCH",
-        "DELETE",
-        "OPTIONS",
-    ],
-
-    allow_headers=[
-        "Authorization",
-        "Content-Type",
-        "Accept",
-    ],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept"],
 )
 
 
@@ -379,7 +355,6 @@ app.include_router(
 
 
 # # 21.4 Career Path
-app.include_router(career_path_router)
 
 
 # 21.5 Personalized Learning Roadmap
@@ -402,7 +377,6 @@ app.include_router(
 
 # 21.10 AI Career Report
 app.include_router(career_report_router)
-app.include_router(mentors_router)
 app.include_router(admin.router)
 
 
