@@ -86,9 +86,9 @@ export default function RegisterPage() {
       return;
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       setMessage(
-        "Password must contain at least 6 characters."
+        "Password must contain at least 8 characters."
       );
       return;
     }
@@ -162,7 +162,7 @@ export default function RegisterPage() {
           error.message === "Network Error"
         ) {
           setMessage(
-            "Unable to connect to the CareerAI server. Please make sure the backend is running on https://careerai-6.onrender.com/"
+            "Unable to connect to the CareerAI server. Please make sure the backend is running on https://careerai-6.onrender.com"
           );
 
           return;

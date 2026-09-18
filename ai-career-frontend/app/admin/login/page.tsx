@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import api from "@/services/api";
 import {
   ShieldCheck,
   Lock,
@@ -10,14 +11,6 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-
-type AdminData = {
-  name: string;
-  email: string;
-  password: string;
-  role: string;
-  createdAt: string;
-};
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -30,47 +23,55 @@ export default function AdminLoginPage() {
 
   const [error, setError] = useState("");
 
-  const handleLogin = (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     setError("");
 
-    if (!email.trim() || !password.trim()) {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail || !password) {
       setError("Please enter email and password");
       return;
     }
 
-    const savedAdmin =
-      localStorage.getItem("careerai-admin");
-
-    if (!savedAdmin) {
-      setError(
-        "Admin account not found. Please register first."
-      );
-      return;
-    }
-
     try {
-      const admin: AdminData =
-        JSON.parse(savedAdmin);
+      const formData = new URLSearchParams();
+      formData.append("username", normalizedEmail);
+      formData.append("password", password);
 
-      if (
-        admin.email === email &&
-        admin.password === password
-      ) {
-        localStorage.setItem(
-          "careerai-admin-logged-in",
-          "true"
-        );
+      const response = await api.post<{ access_token: string; token_type: string }>(
+        "/auth/login",
+        formData,
+        { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+      );
 
-        router.push("/admin");
-      } else {
-        setError("Invalid email or password");
+      const token = response.data.access_token;
+      if (!token) throw new Error("No access token returned by server.");
+
+      localStorage.setItem("access_token", token);
+      localStorage.setItem("token", token);
+      localStorage.setItem("token_type", "bearer");
+
+      const me = await api.get<{ id: number; name: string; email: string; role: string }>("/auth/me");
+      if (me.data.role !== "admin") {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("token");
+        localStorage.removeItem("token_type");
+        setError("This account does not have administrator access.");
+        return;
       }
-    } catch {
-      setError("Something went wrong. Please try again.");
+
+      await api.get("/admin/me");
+      router.push("/admin");
+    } catch (err: unknown) {
+      console.error("Admin login failed:", err);
+      if (typeof err === "object" && err && "response" in err) {
+        const response = (err as { response?: { status?: number; data?: { detail?: string; error?: { message?: string } } } }).response;
+        setError(response?.data?.error?.message || response?.data?.detail || "Invalid admin email or password.");
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Unable to connect to CareerAI server.");
+      }
     }
   };
 
@@ -179,17 +180,6 @@ export default function AdminLoginPage() {
             Login to Admin Panel
           </button>
         </form>
-
-        {/* Register */}
-        <p className="mt-6 text-center text-sm text-slate-500">
-          Do not have an admin account?{" "}
-          <Link
-            href="/admin/register"
-            className="font-semibold text-purple-600 hover:text-purple-700"
-          >
-            Register
-          </Link>
-        </p>
 
         <div className="mt-6 border-t pt-5 text-center">
           <Link
