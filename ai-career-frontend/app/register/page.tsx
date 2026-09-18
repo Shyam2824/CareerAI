@@ -162,7 +162,7 @@ export default function RegisterPage() {
           error.message === "Network Error"
         ) {
           setMessage(
-            "Unable to connect to the CareerAI server. Please make sure the backend is running on https://careerai-5-mn6f.onrender.com"
+            "Unable to connect to the CareerAI server. Please make sure the backend is running on https://careerai-6.onrender.com/"
           );
 
           return;

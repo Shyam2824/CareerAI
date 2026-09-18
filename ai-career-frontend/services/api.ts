@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  "https://careerai-5-mn6f.onrender.com";
+  "https://careerai-6.onrender.com/";
 
 const api = axios.create({
   baseURL: API_URL,

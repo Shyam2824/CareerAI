@@ -10,7 +10,7 @@ import {
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  "https://careerai-5-mn6f.onrender.com";
+  "https://careerai-6.onrender.com/";
 
 function imageUrl(path?: string | null): string {
   if (!path) {
